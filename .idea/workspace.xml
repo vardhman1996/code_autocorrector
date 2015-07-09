@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="866e79cc-184f-4611-879e-ee19ba83570e" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/WizRocket_Validator.java" afterPath="$PROJECT_DIR$/src/WizRocket_Validator.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/NodeValidator.java" afterPath="$PROJECT_DIR$/src/NodeValidator.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="WizRocket_Validator.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -39,9 +40,11 @@
       <file leaf-file-name="NodeValidator.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/NodeValidator.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.07964602">
-              <caret line="3" column="26" selection-start-line="3" selection-start-column="26" selection-end-line="3" selection-end-column="26" />
-              <folding />
+            <state vertical-scroll-proportion="0.94690263">
+              <caret line="38" column="5" selection-start-line="38" selection-start-column="5" selection-end-line="38" selection-end-column="5" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -67,6 +70,7 @@
     <option name="CHANGED_PATHS">
       <list>
         <option value="$PROJECT_DIR$/src/WizRocket_Validator.java" />
+        <option value="$PROJECT_DIR$/src/NodeValidator.java" />
       </list>
     </option>
   </component>
@@ -331,9 +335,11 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/NodeValidator.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.07964602">
-          <caret line="3" column="26" selection-start-line="3" selection-start-column="26" selection-end-line="3" selection-end-column="26" />
-          <folding />
+        <state vertical-scroll-proportion="0.94690263">
+          <caret line="38" column="5" selection-start-line="38" selection-start-column="5" selection-end-line="38" selection-end-column="5" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
