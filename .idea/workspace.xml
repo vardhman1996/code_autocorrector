@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="866e79cc-184f-4611-879e-ee19ba83570e" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/NodeValidator.java" afterPath="$PROJECT_DIR$/src/NodeValidator.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/Validation.java" afterPath="$PROJECT_DIR$/src/Validation.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/WizRocket_Validator.java" afterPath="$PROJECT_DIR$/src/WizRocket_Validator.java" />
     </list>
@@ -30,7 +29,7 @@
         <entry file="file://$PROJECT_DIR$/src/WizRocket_Validator.java">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="43" column="33" selection-start-line="43" selection-start-column="33" selection-end-line="43" selection-end-column="33" />
+              <caret line="41" column="66" selection-start-line="41" selection-start-column="66" selection-end-line="41" selection-end-column="66" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -41,8 +40,8 @@
       <file leaf-file-name="Validation.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/Validation.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="1.3451327">
-              <caret line="92" column="28" selection-start-line="92" selection-start-column="28" selection-end-line="92" selection-end-column="28" />
+            <state vertical-scroll-proportion="0.94690263">
+              <caret line="110" column="5" selection-start-line="110" selection-start-column="5" selection-end-line="110" selection-end-column="5" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -82,8 +81,8 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/WizRocket_Validator.java" />
         <option value="$PROJECT_DIR$/src/NodeValidator.java" />
+        <option value="$PROJECT_DIR$/src/WizRocket_Validator.java" />
         <option value="$PROJECT_DIR$/src/Validation.java" />
       </list>
     </option>
@@ -352,7 +351,7 @@
     <entry file="file://$PROJECT_DIR$/src/WizRocket_Validator.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="43" column="33" selection-start-line="43" selection-start-column="33" selection-end-line="43" selection-end-column="33" />
+          <caret line="41" column="66" selection-start-line="41" selection-start-column="66" selection-end-line="41" selection-end-column="66" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
@@ -361,8 +360,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/Validation.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="1.3451327">
-          <caret line="92" column="28" selection-start-line="92" selection-start-column="28" selection-end-line="92" selection-end-column="28" />
+        <state vertical-scroll-proportion="0.94690263">
+          <caret line="110" column="5" selection-start-line="110" selection-start-column="5" selection-end-line="110" selection-end-column="5" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>

@@ -95,5 +95,18 @@ public class Validation {
         } else {
             System.out.println("Receiver tag configured correctly");
         }
+
+        assert receiver != null;
+        NodeList receiverChildren = receiver.getChildNodes();
+        ra.clear();
+        ra.put("android:name", "com.android.vending.INSTALL_REFERRER");
+        for (int i = 0; i<receiverChildren.getLength(); i++) {
+            Node childrenItem = receiverChildren.item(i);
+            if (!childrenItem.getNodeName().equals("intent-filter")) continue;
+            Node action = nodeValidator.contains(childrenItem, "action", ra);
+            if(action!=null) {
+                System.out.println("Correct action class for receiver");
+            }
+        }
     }
 }
