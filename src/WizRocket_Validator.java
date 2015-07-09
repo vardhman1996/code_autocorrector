@@ -29,6 +29,7 @@ public class WizRocket_Validator {
             System.out.println(userPackage);
 
             NodeList usesPermList = docElm.getElementsByTagName("uses-permission");
+            NodeList gcmPermList = docElm.getElementsByTagName("permission");
 
             NodeList applicationList = docElm.getElementsByTagName("application");
             if (applicationList == null || applicationList.getLength() != 1) return;
@@ -40,7 +41,7 @@ public class WizRocket_Validator {
             validateTags.validateUsesPermissions(usesPermList);
             validateTags.validateRequiredMeta(applicationNode);
             validateTags.validateRequiredReceiver(applicationNode);
-            validateTags.validateGcmReceiver(applicationNode);
+            validateTags.validateGcmReceiver(applicationNode, usesPermList, gcmPermList);
 
             if (usesPermList == null || usesPermList.getLength() < 1) return;
         } catch (ParserConfigurationException | SAXException | IOException e) {

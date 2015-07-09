@@ -58,6 +58,7 @@ public class Validation {
         } else {
             System.out.println("Does contain recommended uses permissions");
         }
+
     }
 
     public void validateRequiredMeta(Node applicationNode) {
@@ -118,7 +119,7 @@ public class Validation {
 
     }
 
-    public void validateGcmReceiver(Node applicationNode) {
+    public void validateGcmReceiver(Node applicationNode, NodeList usesPermList, NodeList gcmPermList) {
         ra.clear();
         ra.put("android:name", "com.wizrocket.android.sdk.GcmBroadcastReceiver");
         ra.put("android:permission", "com.google.android.c2dm.permission.SEND");
@@ -143,14 +144,56 @@ public class Validation {
         ra.clear();
         ra.put("android:name", userPackage);
         Node category = getNode("intent-filter", "category", ra, gcmReceiverChildren);
+        
+        boolean matchedAll = false;
+
+        for (int i = 0; i < usesPermList.getLength(); i++) {
+            Node tempUsesItem = usesPermList.item(i);
+            NamedNodeMap usesMap = tempUsesItem.getAttributes();
+            usesSet.add(usesMap.getNamedItem("android:name").getNodeValue());
+        }
+
+        for (int i = 0; i < gcmPermList.getLength(); i++) {
+            Node tempGcmPermItem = gcmPermList.item(i);
+            NamedNodeMap gcmPermMap = tempGcmPermItem.getAttributes();
+            usesSet.add(gcmPermMap.getNamedItem("android:name").getNodeValue());
+            usesSet.add(gcmPermMap.getNamedItem("android:protectionLevel").getNodeValue());
+        }
+
+
+        if (usesSet.contains("signature") && usesSet.contains(userPackage + ".permission.C2D_MESSAGE") && usesSet.contains("com.google.android.c2dm.permission.RECEIVE")) {
+            matchedAll = true;
+        } else {
+            System.out.println("Uses permissions for GCM not configured correctly");
+        }
+        ra.clear();
+        ra.put("android:name", "GCM_SENDER_ID");
+        Node firstMeta = nodeValidator.contains(applicationNode, "meta-data", ra);
+        if (firstMeta == null) {
+            System.out.println("GCM_ID not configured");
+        }
+        ra.clear();
+        ra.put("android:name", "com.google.android.gms.version");
+        ra.put("android:value", "@integer/google_play_services_version");
+
+        Node secondMeta = nodeValidator.contains(applicationNode, "meta-data", ra);
+        if (secondMeta == null) {
+            System.out.println("Second Meta not configured correctly");
+        }
+
+        if (matchedAll && firstActionNode != null && secondActionNode != null && category != null) {
+            System.out.println("GCM configured");
+        } else {
+            System.out.println("GCM not configured");
+        }
     }
 
 
-    private Node getNode (String innerTag, String tagName, Map<String, String> newRa, NodeList nodeList) {
+    private Node getNode(String innerTag, String tagName, Map<String, String> newRa, NodeList nodeList) {
         Node node = null;
-        for (int i = 0; i<nodeList.getLength(); i++) {
+        for (int i = 0; i < nodeList.getLength(); i++) {
             Node childrenItem = nodeList.item(i);
-            if(!childrenItem.getNodeName().equals(innerTag)) continue;
+            if (!childrenItem.getNodeName().equals(innerTag)) continue;
             node = nodeValidator.contains(childrenItem, tagName, newRa);
         }
         return node;
