@@ -144,7 +144,7 @@ public class Validation {
         ra.clear();
         ra.put("android:name", userPackage);
         Node category = getNode("intent-filter", "category", ra, gcmReceiverChildren);
-        
+
         boolean matchedAll = false;
 
         for (int i = 0; i < usesPermList.getLength(); i++) {
@@ -186,6 +186,30 @@ public class Validation {
         } else {
             System.out.println("GCM not configured");
         }
+    }
+
+    public void validateInAppNotifications(Node applicationNode) {
+        ra.clear();
+        ra.put("android:name", "com.wizrocket.android.sdk.InAppNotificationActivity");
+        ra.put("android:theme", "@android:style/Theme.Translucent.NoTitleBar");
+        ra.put("android:configChanges", "orientation|keyboardHidden");
+        Node actionNode = nodeValidator.contains(applicationNode, "activity", ra);
+        if(actionNode == null) {
+            System.out.println("Activity tag not configured correctly");
+            return;
+        }
+
+        ra.clear();
+        ra.put("android:name", "WIZROCKET_INAPP_EXCLUDE");
+        ra.put("android:value", "SplashActivity");
+        Node metaNode = nodeValidator.contains(applicationNode, "meta-data", ra);
+        if(metaNode == null) {
+            System.out.println("Meta node for in app notification not configured correctly");
+            return;
+        }
+
+        System.out.println("In-App notifications configured correctly");
+
     }
 
 

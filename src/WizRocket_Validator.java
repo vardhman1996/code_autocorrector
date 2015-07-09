@@ -42,6 +42,7 @@ public class WizRocket_Validator {
             validateTags.validateRequiredMeta(applicationNode);
             validateTags.validateRequiredReceiver(applicationNode);
             validateTags.validateGcmReceiver(applicationNode, usesPermList, gcmPermList);
+            validateTags.validateInAppNotifications(applicationNode);
 
             if (usesPermList == null || usesPermList.getLength() < 1) return;
         } catch (ParserConfigurationException | SAXException | IOException e) {
