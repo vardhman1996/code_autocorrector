@@ -16,10 +16,14 @@ public class Validation {
     private static Pattern accountToken = Pattern.compile("^(\\w\\w\\w)-(\\w\\w\\w)$");
     private HashSet<String> usesSet;
     private NodeValidator nodeValidator;
+    private Map<String, String> ra;
+    private String userPackage;
 
-    public Validation() {
+    public Validation(String userPackage) {
         usesSet = new HashSet<>();
         nodeValidator = new NodeValidator();
+        ra = new HashMap<>();
+        this.userPackage = userPackage;
     }
 
     // Validate application node attributes
@@ -85,28 +89,70 @@ public class Validation {
         }
     }
 
-    public void validateRequiredReceiver (Node applicationNode) {
-        Map<String, String> ra = new HashMap<>();
+    public void validateRequiredReceiver(Node applicationNode) {
+        ra.clear();
         ra.put("android:name", "com.wizrocket.android.sdk.InstallReferrerBroadcastReceiver");
         ra.put("android:exported", "true");
         Node receiver = nodeValidator.contains(applicationNode, "receiver", ra);
-        if(receiver!=null) {
-            System.out.println("Receiver tag configured correctly");
-        } else {
-            System.out.println("Receiver tag configured correctly");
-        }
 
-        assert receiver != null;
+        if (receiver == null) {
+            System.out.println("referral tracking receiver tag not configured correctly");
+            return;
+        }
+//        if(receiver!=null) {
+//            System.out.println("Receiver tag configured correctly");
+//        } else {
+//            System.out.println("Receiver tag configured correctly");
+//        }
         NodeList receiverChildren = receiver.getChildNodes();
         ra.clear();
         ra.put("android:name", "com.android.vending.INSTALL_REFERRER");
-        for (int i = 0; i<receiverChildren.getLength(); i++) {
-            Node childrenItem = receiverChildren.item(i);
-            if (!childrenItem.getNodeName().equals("intent-filter")) continue;
-            Node action = nodeValidator.contains(childrenItem, "action", ra);
-            if(action!=null) {
-                System.out.println("Correct action class for receiver");
-            }
+        Node actionNode = getNode("intent-filter", "action", ra, receiverChildren);
+
+
+        if (actionNode != null) {
+            System.out.println("Referral tracking receiver configured correctly");
+        } else {
+            System.out.println("Action tag configured incorrectly");
         }
+
+    }
+
+    public void validateGcmReceiver(Node applicationNode) {
+        ra.clear();
+        ra.put("android:name", "com.wizrocket.android.sdk.GcmBroadcastReceiver");
+        ra.put("android:permission", "com.google.android.c2dm.permission.SEND");
+        Node gcmReceiver = nodeValidator.contains(applicationNode, "receiver", ra);
+
+        if (gcmReceiver == null) {
+            System.out.println("Push Notifications receiver incorrect");
+            return;
+        }
+
+        NodeList gcmReceiverChildren = gcmReceiver.getChildNodes();
+
+        ra.clear();
+        ra.put("android:name", "com.google.android.c2dm.intent.RECEIVE");
+        Node firstActionNode = getNode("intent-filter", "action", ra, gcmReceiverChildren);
+
+
+        ra.clear();
+        ra.put("android:name", "com.google.android.c2dm.intent.REGISTRATION");
+        Node secondActionNode = getNode("intent-filter", "action", ra, gcmReceiverChildren);
+
+        ra.clear();
+        ra.put("android:name", userPackage);
+        Node category = getNode("intent-filter", "category", ra, gcmReceiverChildren);
+    }
+
+
+    private Node getNode (String innerTag, String tagName, Map<String, String> newRa, NodeList nodeList) {
+        Node node = null;
+        for (int i = 0; i<nodeList.getLength(); i++) {
+            Node childrenItem = nodeList.item(i);
+            if(!childrenItem.getNodeName().equals(innerTag)) continue;
+            node = nodeValidator.contains(childrenItem, tagName, newRa);
+        }
+        return node;
     }
 }
