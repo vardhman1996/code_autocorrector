@@ -1,6 +1,4 @@
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
+import org.w3c.dom.*;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -8,28 +6,44 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 /**
  * Created by VardhmanMehta on 09/07/15.
  */
 public class WizRocket_Validator {
+
     public static void main(String[] args) {
         String filePath = args[0];
         File file = new File(filePath);
-        System.out.println(filePath);
         Document dom;
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        String userPackage;
         try {
             DocumentBuilder db = dbf.newDocumentBuilder();
             dom = db.parse(file);
             Element docElm = dom.getDocumentElement();
-            userPackage = docElm.getAttribute("package");
+            String userPackage = docElm.getAttribute("package");
+
+            System.out.println(userPackage);
+
             NodeList usesPermList = docElm.getElementsByTagName("uses-permission");
+
+            NodeList applicationList = docElm.getElementsByTagName("application");
+            if (applicationList == null || applicationList.getLength() != 1) return;
+
+            Node applicationNode = applicationList.item(0);
+
+            Validation validateTags = new Validation();
+            validateTags.validateAndroidName(applicationNode);
+
+
             if (usesPermList == null || usesPermList.getLength() < 1) return;
         } catch (ParserConfigurationException | SAXException | IOException e) {
             e.printStackTrace();
         }
 
     }
+
 }
