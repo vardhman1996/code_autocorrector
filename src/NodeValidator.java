@@ -14,7 +14,7 @@ public class NodeValidator {
      * @param ra
      * @return
      */
-    public static Node contains(Node root, String tagName, Map<String, String> ra) {
+    public Node contains(Node root, String tagName, Map<String, String> ra) {
         NodeList children = root.getChildNodes();
         for (int i = 0; i < children.getLength(); i++) {
             Node item = children.item(i);
