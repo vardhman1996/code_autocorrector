@@ -25,6 +25,12 @@ public class NodeValidator {
             for (String attr : ra.keySet()) {
                 NamedNodeMap nodeAttributes = item.getAttributes();
                 Node attributeValue = nodeAttributes.getNamedItem(attr);
+
+
+                if (attributeValue == null) {
+                    matchedAll = false;
+                    break;
+                }
                 if (!ra.get(attr).equals(attributeValue.getNodeValue())) {
                     matchedAll = false;
                     break;
