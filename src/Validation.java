@@ -42,7 +42,7 @@ public class Validation {
             System.out.println("Android Name recognized");
         } else {
             boolean found = checkJavaFile(applicationNode);
-            if(found) {
+            if (found) {
                 System.out.println("Step 3 configured");
             } else {
                 System.out.println("Android Name not recognized");
@@ -272,6 +272,7 @@ public class Validation {
 
 class MethodVisitor extends VoidVisitorAdapter {
     private boolean found = false;
+
     @Override
     public void visit(MethodDeclaration n, Object arg) {
         boolean foundOnCreate = false;
@@ -280,13 +281,13 @@ class MethodVisitor extends VoidVisitorAdapter {
             for (com.github.javaparser.ast.Node item : childrenNodes) {
                 for (com.github.javaparser.ast.Node node : item.getChildrenNodes()) {
                     if (node.toString().startsWith("super.onCreate")) {
+                        System.out.println("super.onCreate() not on the correct line");
                         foundOnCreate = true;
                     }
                     if (!foundOnCreate && node.toString().equals("ActivityLifecycleCallback.register(this);")) {
                         found = true;
                     }
                 }
-
             }
         }
     }
