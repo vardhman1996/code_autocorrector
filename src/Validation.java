@@ -1,7 +1,14 @@
+import com.github.javaparser.JavaParser;
+import com.github.javaparser.ParseException;
+import com.github.javaparser.ast.CompilationUnit;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -19,6 +26,7 @@ public class Validation {
     private Map<String, String> ra;
     private String userPackage;
 
+
     public Validation(String userPackage) {
         usesSet = new HashSet<>();
         nodeValidator = new NodeValidator();
@@ -32,8 +40,46 @@ public class Validation {
         if (attributesMap.getNamedItem("android:name") != null && attributesMap.getNamedItem("android:name").getNodeValue().equals("com.wizrocket.android.sdk.Application")) {
             System.out.println("Android Name recognized");
         } else {
+            checkJavaFile(applicationNode);
+
             System.out.println("Android Name not recognized");
         }
+        checkJavaFile(applicationNode);
+    }
+
+    private boolean checkJavaFile(Node applicationNode) {
+        CompilationUnit cu = null;
+        String[] parts = userPackage.split("\\.");
+        String javaPath = "/Users/VardhmanMehta/Desktop/src/main/";
+        for (int i = 0; i < parts.length; i++) {
+            javaPath += parts[i] + "/";
+        }
+        String mainFile=null;
+        NodeList children = applicationNode.getChildNodes();
+        int length = children.getLength();
+        for (int i = 0; i < length; i++) {
+            Node item = children.item(i);
+            if (!item.getNodeName().equals("activity")) continue;
+            NamedNodeMap activityAttr = item.getAttributes();
+            if (activityAttr.getNamedItem("android:name").getNodeValue().startsWith(".")) {
+                mainFile = activityAttr.getNamedItem("android:name").getNodeValue().split("\\.")[1];
+            }
+        }
+        if (mainFile == null) {
+            System.out.println("Main file does not exists");
+        } else {
+            javaPath += mainFile + ".java";
+        }
+        try {
+            FileInputStream javaFile = new FileInputStream(javaPath);
+            cu = JavaParser.parse(javaFile);
+        } catch (ParseException | IOException e) {
+            e.printStackTrace();
+        }
+        assert cu != null;
+        System.out.println(cu.toString());
+        return true;
+
     }
 
     public void validateUsesPermissions(NodeList usesPermList) {
@@ -194,7 +240,7 @@ public class Validation {
         ra.put("android:theme", "@android:style/Theme.Translucent.NoTitleBar");
         ra.put("android:configChanges", "orientation|keyboardHidden");
         Node actionNode = nodeValidator.contains(applicationNode, "activity", ra);
-        if(actionNode == null) {
+        if (actionNode == null) {
             System.out.println("Activity tag not configured correctly");
             return;
         }
@@ -203,7 +249,7 @@ public class Validation {
         ra.put("android:name", "WIZROCKET_INAPP_EXCLUDE");
         ra.put("android:value", "SplashActivity");
         Node metaNode = nodeValidator.contains(applicationNode, "meta-data", ra);
-        if(metaNode == null) {
+        if (metaNode == null) {
             System.out.println("Meta node for in app notification not configured correctly");
             return;
         }
@@ -213,12 +259,12 @@ public class Validation {
     }
 
 
-    private Node getNode(String innerTag, String tagName, Map<String, String> newRa, NodeList nodeList) {
+    private Node getNode(String innerTag, String tagName, Map<String, String> newMap, NodeList nodeList) {
         Node node = null;
         for (int i = 0; i < nodeList.getLength(); i++) {
             Node childrenItem = nodeList.item(i);
             if (!childrenItem.getNodeName().equals(innerTag)) continue;
-            node = nodeValidator.contains(childrenItem, tagName, newRa);
+            node = nodeValidator.contains(childrenItem, tagName, newMap);
         }
         return node;
     }
