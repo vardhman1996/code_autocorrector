@@ -1,6 +1,8 @@
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ParseException;
 import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -11,6 +13,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -40,11 +43,13 @@ public class Validation {
         if (attributesMap.getNamedItem("android:name") != null && attributesMap.getNamedItem("android:name").getNodeValue().equals("com.wizrocket.android.sdk.Application")) {
             System.out.println("Android Name recognized");
         } else {
-            checkJavaFile(applicationNode);
-
-            System.out.println("Android Name not recognized");
+            boolean found = checkJavaFile(applicationNode);
+            if(found) {
+                System.out.println("Step 3 configured");
+            } else {
+                System.out.println("Android Name not recognized");
+            }
         }
-        checkJavaFile(applicationNode);
     }
 
     private boolean checkJavaFile(Node applicationNode) {
@@ -54,7 +59,7 @@ public class Validation {
         for (int i = 0; i < parts.length; i++) {
             javaPath += parts[i] + "/";
         }
-        String mainFile=null;
+        String mainFile = null;
         NodeList children = applicationNode.getChildNodes();
         int length = children.getLength();
         for (int i = 0; i < length; i++) {
@@ -77,8 +82,9 @@ public class Validation {
             e.printStackTrace();
         }
         assert cu != null;
-        System.out.println(cu.toString());
-        return true;
+        MethodVisitor mv = new MethodVisitor();
+        mv.visit(cu, null);
+        return mv.getFound();
 
     }
 
@@ -267,5 +273,33 @@ public class Validation {
             node = nodeValidator.contains(childrenItem, tagName, newMap);
         }
         return node;
+    }
+}
+
+
+class MethodVisitor extends VoidVisitorAdapter {
+    private boolean found;
+    @Override
+    public void visit(MethodDeclaration n, Object arg) {
+        boolean foundOnCreate = false;
+        if (n.getName().equals("onCreate")) {
+            List<com.github.javaparser.ast.Node> childrenNodes = n.getChildrenNodes();
+            for (com.github.javaparser.ast.Node item : childrenNodes) {
+                for (com.github.javaparser.ast.Node node : item.getChildrenNodes()) {
+                    if (node.toString().startsWith("super.onCreate")) {
+                        foundOnCreate = true;
+                    }
+                    if (!foundOnCreate && node.toString().equals("ActivityLifecycleCallback.register(this);")) {
+                        found = true;
+                    }
+                }
+
+            }
+        }
+        found = false;
+    }
+
+    public boolean getFound() {
+        return found;
     }
 }
