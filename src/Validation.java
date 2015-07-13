@@ -7,9 +7,7 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -278,7 +276,7 @@ public class Validation {
 
 
 class MethodVisitor extends VoidVisitorAdapter {
-    private boolean found;
+    private boolean found = false;
     @Override
     public void visit(MethodDeclaration n, Object arg) {
         boolean foundOnCreate = false;
@@ -296,7 +294,6 @@ class MethodVisitor extends VoidVisitorAdapter {
 
             }
         }
-        found = false;
     }
 
     public boolean getFound() {
