@@ -150,11 +150,6 @@ public class Validation {
             System.out.println("referral tracking receiver tag not configured correctly");
             return;
         }
-//        if(receiver!=null) {
-//            System.out.println("Receiver tag configured correctly");
-//        } else {
-//            System.out.println("Receiver tag configured correctly");
-//        }
         NodeList receiverChildren = receiver.getChildNodes();
         ra.clear();
         ra.put("android:name", "com.android.vending.INSTALL_REFERRER");
