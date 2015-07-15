@@ -28,7 +28,6 @@ public class WizRocket_Validator {
             Element docElm = dom.getDocumentElement();
             String userPackage = docElm.getAttribute("package");
 
-            System.out.println(userPackage);
 
             NodeList usesPermList = docElm.getElementsByTagName("uses-permission");
             NodeList gcmPermList = docElm.getElementsByTagName("permission");
@@ -39,7 +38,7 @@ public class WizRocket_Validator {
             Node applicationNode = applicationList.item(0);
 
             Validation validateTags = new Validation(userPackage);
-            validateTags.validateAndroidName(applicationNode);
+            validateTags.validateAndroidName(applicationNode, filePath);
             validateTags.validateUsesPermissions(usesPermList);
             validateTags.validateRequiredMeta(applicationNode);
             validateTags.validateRequiredReceiver(applicationNode);

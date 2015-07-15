@@ -7,12 +7,10 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -36,12 +34,12 @@ public class Validation {
     }
 
     // Validate application node attributes
-    public void validateAndroidName(Node applicationNode) {
+    public void validateAndroidName(Node applicationNode, String filePath) {
         NamedNodeMap attributesMap = applicationNode.getAttributes();
         if (attributesMap.getNamedItem("android:name") != null && attributesMap.getNamedItem("android:name").getNodeValue().equals("com.wizrocket.android.sdk.Application")) {
             System.out.println("Android Name recognized");
         } else {
-            boolean found = checkJavaFile(applicationNode);
+            boolean found = checkJavaFile(applicationNode, filePath, attributesMap);
             if (found) {
                 System.out.println("Step 3 configured");
             } else {
@@ -50,40 +48,85 @@ public class Validation {
         }
     }
 
-    private boolean checkJavaFile(Node applicationNode) {
+    private boolean checkJavaFile(Node applicationNode, String filePath, NamedNodeMap attributesMap) {
         CompilationUnit cu = null;
-        String[] parts = userPackage.split("\\.");
-        String javaPath = "/Users/VardhmanMehta/Desktop/src/main/";
-        for (int i = 0; i < parts.length; i++) {
-            javaPath += parts[i] + "/";
+        String[] filePathParts = filePath.split("/");
+        String path = "";
+
+        for (int i = 0; i < filePathParts.length - 1; i++) {
+            path += filePathParts[i] + "/";
         }
-        String mainFile = null;
-        NodeList children = applicationNode.getChildNodes();
-        int length = children.getLength();
-        for (int i = 0; i < length; i++) {
-            Node item = children.item(i);
-            if (!item.getNodeName().equals("activity")) continue;
-            NamedNodeMap activityAttr = item.getAttributes();
-            if (activityAttr.getNamedItem("android:name").getNodeValue().startsWith(".")) {
-                mainFile = activityAttr.getNamedItem("android:name").getNodeValue().split("\\.")[1];
+
+        String[] parts = userPackage.split("\\.");
+        String folder = parts[0];
+        String newPath = listf(path, folder);
+
+        for (String part : parts) {
+            newPath += part + "/";
+        }
+
+        if (attributesMap.getNamedItem("android:name").getNodeValue().startsWith(".")) {
+            newPath += attributesMap.getNamedItem("android:name").getNodeValue().split("\\.")[1];
+        }
+
+        if (attributesMap.getNamedItem("android:name").getNodeValue().startsWith(folder)) {
+            String[] androidNameParts = attributesMap.getNamedItem("android:name").getNodeValue().split("\\.");
+            newPath += androidNameParts[androidNameParts.length - 1];
+        }
+
+        
+
+
+//        String[] parts = userPackage.split("\\.");
+//        String javaPath = "/Users/VardhmanMehta/Desktop/src/main/";
+//        for (String part : parts) {
+//            javaPath += part + "/";
+//        }
+//        String mainFile = null;
+//        NodeList children = applicationNode.getChildNodes();
+//        int length = children.getLength();
+//        for (int i = 0; i < length; i++) {
+//            Node item = children.item(i);
+//            if (!item.getNodeName().equals("application")) continue;
+//            NamedNodeMap applicationAttr = item.getAttributes();
+//            if (applicationAttr.getNamedItem("android:name").getNodeValue().startsWith(".")) {
+//                mainFile = applicationAttr.getNamedItem("android:name").getNodeValue().split("\\.")[1];
+//            }
+//        }
+//        if (mainFile == null) {
+//            System.out.println("Main file does not exists");
+//        } else {
+//            javaPath += mainFile + ".java";
+//        }
+//        try {
+//            FileInputStream javaFile = new FileInputStream(javaPath);
+//            cu = JavaParser.parse(javaFile);
+//        } catch (ParseException | IOException e) {
+//            e.printStackTrace();
+//        }
+//        assert cu != null;
+//        MethodVisitor mv = new MethodVisitor();
+//        mv.visit(cu, null);
+//        return mv.getFound();
+        return true;
+    }
+
+    private String listf(String path, String part) {
+        File directory = new File(path);
+
+        // get all the files from a directory
+        File[] fList = directory.listFiles();
+        assert fList != null;
+        for (File file : fList) {
+            if (file.isDirectory() && file.getName().equals(part)) {
+                return file.getParent();
+            } else {
+                if (file.isDirectory()) {
+                    return listf(file.getAbsolutePath(), part);
+                }
             }
         }
-        if (mainFile == null) {
-            System.out.println("Main file does not exists");
-        } else {
-            javaPath += mainFile + ".java";
-        }
-        try {
-            FileInputStream javaFile = new FileInputStream(javaPath);
-            cu = JavaParser.parse(javaFile);
-        } catch (ParseException | IOException e) {
-            e.printStackTrace();
-        }
-        assert cu != null;
-        MethodVisitor mv = new MethodVisitor();
-        mv.visit(cu, null);
-        return mv.getFound();
-
+        return null;
     }
 
     public void validateUsesPermissions(NodeList usesPermList) {

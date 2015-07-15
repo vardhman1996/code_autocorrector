@@ -26,7 +26,6 @@ public class NodeValidator {
                 NamedNodeMap nodeAttributes = item.getAttributes();
                 Node attributeValue = nodeAttributes.getNamedItem(attr);
 
-
                 if (attributeValue == null) {
                     matchedAll = false;
                     break;
