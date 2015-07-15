@@ -37,19 +37,20 @@ public class Validation {
     // Validate application node attributes
     public void validateAndroidName(Node applicationNode, String filePath) {
         NamedNodeMap attributesMap = applicationNode.getAttributes();
-        if (attributesMap.getNamedItem("android:name") != null && attributesMap.getNamedItem("android:name").getNodeValue().equals("com.wizrocket.android.sdk.Application")) {
-            System.out.println("Android Name recognized");
+        if (attributesMap.getNamedItem("android:name") != null
+                && attributesMap.getNamedItem("android:name").getNodeValue().equals("com.wizrocket.android.sdk.Application")) {
+            System.out.println("[  OK  ] Lifecycle callback configured");
         } else {
-            boolean found = checkJavaFile(applicationNode, filePath, attributesMap);
+            boolean found = checkJavaFile(filePath, attributesMap);
             if (found) {
-                System.out.println("Step 3 configured");
+                System.out.println("[  OK  ] Lifecycle callback configured correctly");
             } else {
-                System.out.println("Android Name not recognized");
+                System.out.println("[  ERR  ] Lifecycle callback configured incorrectly");
             }
         }
     }
 
-    private boolean checkJavaFile(Node applicationNode, String filePath, NamedNodeMap attributesMap) {
+    private boolean checkJavaFile(String filePath, NamedNodeMap attributesMap) {
         CompilationUnit cu = null;
         String[] filePathParts = filePath.split("/");
         String path = "";
@@ -79,7 +80,6 @@ public class Validation {
 
         try {
             FileInputStream javaFile = new FileInputStream(newPath);
-            System.out.println("Detected application class at: " + newPath);
             cu = JavaParser.parse(javaFile);
         } catch (ParseException | IOException e) {
             e.printStackTrace();
@@ -89,7 +89,7 @@ public class Validation {
         MethodVisitor mv = new MethodVisitor();
         mv.visit(cu, null);
         return mv.getFound();
-        
+
     }
 
     private String listf(String path, String part) {
@@ -119,23 +119,25 @@ public class Validation {
 
 
         if (usesSet.contains("android.permission.READ_PHONE_STATE") && usesSet.contains("android.permission.INTERNET")) {
-            System.out.println("Contains required uses permissions");
+            System.out.println("[  OK  ] Uses Permissions configured correctly");
         } else {
-            System.out.println("Does not contain required uses permissions");
+            System.out.println("[  ERR  ] Uses permissions configured incorrectly");
         }
-        if (!usesSet.contains("android.permission.ACCESS_NETWORK_STATE") ||
-                !usesSet.contains("android.permission.GET_ACCOUNTS") ||
-                !usesSet.contains("android.permission.ACCESS_COARSE_LOCATION") ||
-                !usesSet.contains("android.permission.WRITE_EXTERNAL_STORAGE")) {
+        if (usesSet.contains("android.permission.ACCESS_NETWORK_STATE") &&
+                usesSet.contains("android.permission.GET_ACCOUNTS") &&
+                usesSet.contains("android.permission.ACCESS_COARSE_LOCATION") &&
+                usesSet.contains("android.permission.WRITE_EXTERNAL_STORAGE")) {
 
-            System.out.println("Does not contain recommended uses permissions");
+            System.out.println("[  OK  ] Recommended uses permissions configured correctly");
         } else {
-            System.out.println("Does contain recommended uses permissions");
+            System.out.println("[  WARNING  ] Recommended uses permissions configured incorrectly");
         }
 
     }
 
     public void validateRequiredMeta(Node applicationNode) {
+        boolean accID = false;
+        boolean accToken = false;
         NodeList children = applicationNode.getChildNodes();
         int length = children.getLength();
         for (int i = 0; i < length; i++) {
@@ -147,19 +149,27 @@ public class Validation {
             if (metaAttr.getNamedItem("android:name").getNodeValue().equals("WIZROCKET_ACCOUNT_ID")) {
                 m = accoundID.matcher(metaAttr.getNamedItem("android:value").getNodeValue());
                 if (m.find()) {
-                    System.out.println("Correct format of Account ID");
-                } else {
-                    System.out.println("Account ID not in the correct format");
+                    accID = true;
                 }
             }
 
             if (metaAttr.getNamedItem("android:name").getNodeValue().equals("WIZROCKET_TOKEN")) {
                 m = accountToken.matcher(metaAttr.getNamedItem("android:value").getNodeValue());
                 if (m.find()) {
-                    System.out.println("Correct format of Account Token");
-                } else {
-                    System.out.println("Account Token not in the correct format");
+                    accToken = true;
                 }
+            }
+        }
+
+        if (accID && accToken) {
+            System.out.println("[  OK  ] Account credentials in the correct format");
+        } else {
+            if (accID) {
+                System.out.println("[  ERR  ] Account credentials not in correct format (ERR: Account Token)");
+            } else if (accToken) {
+                System.out.println("[  ERR  ] Account credentials not in correct format (ERR: Account ID)");
+            } else {
+                System.out.println("[  ERR  ] Account credentials not in correct format (ERR: Account ID & Account Token)");
             }
         }
     }
@@ -171,7 +181,7 @@ public class Validation {
         Node receiver = nodeValidator.contains(applicationNode, "receiver", ra);
 
         if (receiver == null) {
-            System.out.println("referral tracking receiver tag not configured correctly");
+            System.out.println("[  WARNING  ] Referral tracking receiver tag not configured correctly (ERR: Receiver tag)");
             return;
         }
         NodeList receiverChildren = receiver.getChildNodes();
@@ -181,9 +191,9 @@ public class Validation {
 
 
         if (actionNode != null) {
-            System.out.println("Referral tracking receiver configured correctly");
+            System.out.println("[  OK  ] Referral tracking receiver configured correctly");
         } else {
-            System.out.println("Action tag configured incorrectly");
+            System.out.println("[  WARNING  ] Referral tracking receiver tag not configured correctly (ERR: Action tag)");
         }
 
     }
@@ -195,8 +205,7 @@ public class Validation {
         Node gcmReceiver = nodeValidator.contains(applicationNode, "receiver", ra);
 
         if (gcmReceiver == null) {
-            System.out.println("Push Notifications receiver incorrect");
-            return;
+            System.out.println("[ WARNING ] Push Notifications receiver incorrect");
         }
 
         NodeList gcmReceiverChildren = gcmReceiver.getChildNodes();
@@ -233,13 +242,13 @@ public class Validation {
         if (usesSet.contains("signature") && usesSet.contains(userPackage + ".permission.C2D_MESSAGE") && usesSet.contains("com.google.android.c2dm.permission.RECEIVE")) {
             matchedAll = true;
         } else {
-            System.out.println("Uses permissions for GCM not configured correctly");
+            System.out.println("[  WARNING  ] Uses permissions for GCM not configured correctly");
         }
         ra.clear();
         ra.put("android:name", "GCM_SENDER_ID");
         Node firstMeta = nodeValidator.contains(applicationNode, "meta-data", ra);
         if (firstMeta == null) {
-            System.out.println("GCM_ID not configured");
+            System.out.println("[  WARNING  ] GCM_ID not configured");
         }
         ra.clear();
         ra.put("android:name", "com.google.android.gms.version");
@@ -247,25 +256,28 @@ public class Validation {
 
         Node secondMeta = nodeValidator.contains(applicationNode, "meta-data", ra);
         if (secondMeta == null) {
-            System.out.println("Second Meta not configured correctly");
+            System.out.println("[  WARNING  ] GCM not configured");
         }
 
         if (matchedAll && firstActionNode != null && secondActionNode != null && category != null) {
-            System.out.println("GCM configured");
+            System.out.println("[  OK  ] GCM configured correctly");
         } else {
-            System.out.println("GCM not configured");
+            System.out.println("[  WARNING  ] GCM not configured incorrectly");
         }
     }
 
     public void validateInAppNotifications(Node applicationNode) {
+        boolean stage1 = false;
+        boolean stage2 = false;
         ra.clear();
         ra.put("android:name", "com.wizrocket.android.sdk.InAppNotificationActivity");
         ra.put("android:theme", "@android:style/Theme.Translucent.NoTitleBar");
         ra.put("android:configChanges", "orientation|keyboardHidden");
         Node actionNode = nodeValidator.contains(applicationNode, "activity", ra);
         if (actionNode == null) {
-            System.out.println("Activity tag not configured correctly");
-            return;
+            System.out.println("[  WARNING  ] Activity tag not configured correctly");
+        } else {
+            stage1 = true;
         }
 
         ra.clear();
@@ -273,10 +285,16 @@ public class Validation {
         ra.put("android:value", "SplashActivity");
         Node metaNode = nodeValidator.contains(applicationNode, "meta-data", ra);
         if (metaNode == null) {
-            System.out.println("Meta node for in app notification not configured correctly");
+            System.out.println("[  WARNING  ] Meta node for in app notification not configured correctly");
+        } else {
+            stage2 = true;
         }
 
-        System.out.println("In-App notifications configured correctly");
+        if (stage1 && stage2) {
+            System.out.println("[  OK  ] In-App notifications configured correctly");
+        } else {
+            System.out.println("[ WARNING  ] In-App notifications configured incorrectly");
+        }
 
     }
 
@@ -304,7 +322,7 @@ class MethodVisitor extends VoidVisitorAdapter {
             for (com.github.javaparser.ast.Node item : childrenNodes) {
                 for (com.github.javaparser.ast.Node node : item.getChildrenNodes()) {
                     if (!found && node.toString().startsWith("super.onCreate")) {
-                        System.out.println("super.onCreate() not on the correct line");
+                        System.out.println("[  ERR  ] super.onCreate() not on the correct line");
                         foundOnCreate = true;
                     }
                     if (!foundOnCreate && node.toString().equals("ActivityLifecycleCallback.register(this);")) {
