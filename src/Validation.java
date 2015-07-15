@@ -9,6 +9,7 @@ import org.w3c.dom.NodeList;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -60,7 +61,6 @@ public class Validation {
         String[] parts = userPackage.split("\\.");
         String folder = parts[0];
         String newPath = listf(path, folder);
-
         for (String part : parts) {
             newPath += part + "/";
         }
@@ -74,41 +74,22 @@ public class Validation {
             newPath += androidNameParts[androidNameParts.length - 1];
         }
 
+
+        newPath += ".java";
+
+        try {
+            FileInputStream javaFile = new FileInputStream(newPath);
+            System.out.println("Detected application class at: " + newPath);
+            cu = JavaParser.parse(javaFile);
+        } catch (ParseException | IOException e) {
+            e.printStackTrace();
+        }
+
+        assert cu != null;
+        MethodVisitor mv = new MethodVisitor();
+        mv.visit(cu, null);
+        return mv.getFound();
         
-
-
-//        String[] parts = userPackage.split("\\.");
-//        String javaPath = "/Users/VardhmanMehta/Desktop/src/main/";
-//        for (String part : parts) {
-//            javaPath += part + "/";
-//        }
-//        String mainFile = null;
-//        NodeList children = applicationNode.getChildNodes();
-//        int length = children.getLength();
-//        for (int i = 0; i < length; i++) {
-//            Node item = children.item(i);
-//            if (!item.getNodeName().equals("application")) continue;
-//            NamedNodeMap applicationAttr = item.getAttributes();
-//            if (applicationAttr.getNamedItem("android:name").getNodeValue().startsWith(".")) {
-//                mainFile = applicationAttr.getNamedItem("android:name").getNodeValue().split("\\.")[1];
-//            }
-//        }
-//        if (mainFile == null) {
-//            System.out.println("Main file does not exists");
-//        } else {
-//            javaPath += mainFile + ".java";
-//        }
-//        try {
-//            FileInputStream javaFile = new FileInputStream(javaPath);
-//            cu = JavaParser.parse(javaFile);
-//        } catch (ParseException | IOException e) {
-//            e.printStackTrace();
-//        }
-//        assert cu != null;
-//        MethodVisitor mv = new MethodVisitor();
-//        mv.visit(cu, null);
-//        return mv.getFound();
-        return true;
     }
 
     private String listf(String path, String part) {
@@ -119,7 +100,7 @@ public class Validation {
         assert fList != null;
         for (File file : fList) {
             if (file.isDirectory() && file.getName().equals(part)) {
-                return file.getParent();
+                return file.getParent() + "/";
             } else {
                 if (file.isDirectory()) {
                     return listf(file.getAbsolutePath(), part);
@@ -293,7 +274,6 @@ public class Validation {
         Node metaNode = nodeValidator.contains(applicationNode, "meta-data", ra);
         if (metaNode == null) {
             System.out.println("Meta node for in app notification not configured correctly");
-            return;
         }
 
         System.out.println("In-App notifications configured correctly");
@@ -323,7 +303,7 @@ class MethodVisitor extends VoidVisitorAdapter {
             List<com.github.javaparser.ast.Node> childrenNodes = n.getChildrenNodes();
             for (com.github.javaparser.ast.Node item : childrenNodes) {
                 for (com.github.javaparser.ast.Node node : item.getChildrenNodes()) {
-                    if (node.toString().startsWith("super.onCreate")) {
+                    if (!found && node.toString().startsWith("super.onCreate")) {
                         System.out.println("super.onCreate() not on the correct line");
                         foundOnCreate = true;
                     }
