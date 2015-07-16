@@ -1,5 +1,3 @@
-import com.github.javaparser.JavaParser;
-import com.github.javaparser.ast.CompilationUnit;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -18,8 +16,14 @@ import java.io.IOException;
 public class WizRocket_Validator {
 
     public static void main(String[] args) {
-        String filePath = args[0];
-        File file = new File(filePath);
+        File file = null;
+        String filePath = null;
+        try {
+            filePath = args[0];
+            file = new File(filePath);
+        } catch (ArrayIndexOutOfBoundsException e) {
+            System.out.println("Please enter the AndroidManifest file path as an argument");
+        }
         Document dom;
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         try {
@@ -46,10 +50,10 @@ public class WizRocket_Validator {
             validateTags.validateInAppNotifications(applicationNode);
 
             if (usesPermList == null || usesPermList.getLength() < 1) return;
-        } catch (ParserConfigurationException | SAXException | IOException e) {
-            e.printStackTrace();
+        } catch (ParserConfigurationException | SAXException | IOException | IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+            System.exit(1);
         }
 
     }
-
 }

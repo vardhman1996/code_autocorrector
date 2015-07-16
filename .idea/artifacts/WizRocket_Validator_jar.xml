@@ -1,0 +1,9 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="WizRocket_Validator:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/WizRocket_Validator_jar</output-path>
+    <root id="archive" name="WizRocket_Validator.jar">
+      <element id="module-output" name="WizRocket_Validator" />
+      <element id="extracted-dir" path="$USER_HOME$/Downloads/javaparser-core-3.0.0-SNAPSHOT.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>
