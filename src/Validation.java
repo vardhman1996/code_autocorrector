@@ -76,6 +76,7 @@ public class Validation {
             newPath += androidNameParts[androidNameParts.length - 1];
         }
 
+        assert newPath != null;
         File testNull = new File(newPath);
         if(testNull.isDirectory()) {
             return false;
@@ -86,7 +87,7 @@ public class Validation {
             FileInputStream javaFile = new FileInputStream(newPath);
             cu = JavaParser.parse(javaFile);
         } catch (ParseException | IOException e) {
-            e.printStackTrace();
+            return false;
         }
 
         assert cu != null;
@@ -261,7 +262,7 @@ public class Validation {
 
         Node secondMeta = nodeValidator.contains(applicationNode, "meta-data", ra);
         if (secondMeta == null) {
-            System.out.println("[  WARN  ] GCM not configured");
+            System.out.println("[  WARN  ] GCM meta tag not found");
         }
 
         if (matchedAll && firstActionNode != null && secondActionNode != null && category != null) {
