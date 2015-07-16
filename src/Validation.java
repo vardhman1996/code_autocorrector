@@ -67,18 +67,18 @@ public class Validation {
         for (String part : parts) {
             newPath += part + "/";
         }
-        if (attributesMap.getNamedItem("android:name")!=null && attributesMap.getNamedItem("android:name").getNodeValue().startsWith(".")) {
+        if (attributesMap.getNamedItem("android:name") != null && attributesMap.getNamedItem("android:name").getNodeValue().startsWith(".")) {
             newPath += attributesMap.getNamedItem("android:name").getNodeValue().split("\\.")[1];
         }
 
-        if (attributesMap.getNamedItem("android:name")!=null && attributesMap.getNamedItem("android:name").getNodeValue().startsWith(folder)) {
+        if (attributesMap.getNamedItem("android:name") != null && attributesMap.getNamedItem("android:name").getNodeValue().startsWith(folder)) {
             String[] androidNameParts = attributesMap.getNamedItem("android:name").getNodeValue().split("\\.");
             newPath += androidNameParts[androidNameParts.length - 1];
         }
 
         assert newPath != null;
         File testNull = new File(newPath);
-        if(testNull.isDirectory()) {
+        if (testNull.isDirectory()) {
             return false;
         }
         newPath += ".java";
