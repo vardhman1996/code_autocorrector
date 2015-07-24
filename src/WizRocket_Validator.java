@@ -14,16 +14,15 @@ import java.io.IOException;
  * Created by VardhmanMehta on 09/07/15.
  */
 public class WizRocket_Validator {
+    private String filePath;
 
-    public static void main(String[] args) {
+    public WizRocket_Validator(String filePath) {
+        this.filePath = filePath;
+    }
+
+    public void validate() {
         File file = null;
-        String filePath = null;
-        try {
-            filePath = args[0];
-            file = new File(filePath);
-        } catch (ArrayIndexOutOfBoundsException e) {
-            System.out.println("Please enter the AndroidManifest file path as an argument");
-        }
+        file = new File(filePath);
         Document dom;
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         try {
